@@ -1,0 +1,8 @@
+# depslib dependency file v1.0
+1550825741 source:e:\code\pat\1003\main.cpp
+	<iostream>
+	<limits.h>
+	<vector>
+	<list>
+	<queue>
+
