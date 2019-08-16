@@ -2,30 +2,30 @@
 #include <vector>
 #include <cmath>
 using namespace std;
-
-vector<int> digits;
-vector<long long> pos;
+long long num[12];
 int main()
 {
-    int n;
-    scanf("%d",&n);
-    while(n != 0){
-        digits.push_back(n%10);
+    long long n, rm = 0, m = 1, r = 1;
+    cin >> n;
+    num[0] = 0;
+    for (int i = 1; i <=11; i++){
+        num[i] = num[i - 1] * 10 + m;
+        m *= 10;
+    }
+    m = 1;
+    long long sum = 0;
+    while (n != 0){
+        int d = n % 10;
+        if (d == 1){
+            sum += (rm + num[r - 1] + 1);
+        }
+        else if (d != 0)
+            sum += (num[r - 1] * d + m);
+        rm = m * d + rm;
+        m *= 10;
+        r++;
         n /= 10;
     }
-    pos.resize(digits.size());
-    digits[1] = 1;
-    int w = 10;
-    for (int i = 2;i < digits.size();i++){
-        digits[i] = 10*pos[i-1] + w;
-        w *= 10;
-    }
-    long long total = 0;
-    for (int i = 0;i < digits.size();i++){
-        if (digits[i] == 1){
-            total += (pos[i] + )
-        }
-    }
-    printf("%d",total);
+    printf("%lld", sum);
     return 0;
 }
