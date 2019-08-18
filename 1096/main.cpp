@@ -1,34 +1,37 @@
 #include <iostream>
 #include <vector>
+#include <cmath>
 using namespace std;
-vector<int> ans;
 int main()
 {
-    int n;
+    int n, len = 0, lo = 0, hi = 0;
     cin >> n;
+    int maxn = sqrt(n) + 1;
     int i = 2;
-    while(i <= n / 2){
-        while(n % i != 0) i++;
-        int tn = n, cnt = 0;
-        int j = i;
-        while (n % j == 0){
-            cnt++;
-            n /= j;
-            j++;
+    while(i <= maxn){
+        int j, temp = 1;
+        for (j = i; j <= maxn; j++){
+            temp *= j;
+            if (n % temp != 0)
+                break;
         }
-        if (j - i > ans.size()){
-            ans.clear();
-            for (int m = i; m < j; m++)
-                ans.push_back(m);
+        if (j - i > len){
+            lo = i;
+            hi = j;
+            len = j - i;
         }
-        n = tn;
-        i = j;
+        i++;
     }
-    printf("%d\n", ans.size());
-    for (int i = 0; i <ans.size(); i++){
-        if (i != 0)
-            printf("*");
-        printf("%d", ans[i]);
+    if (len == 0){
+        printf("%d\n%d", 1, n);
+    }
+    else{
+        printf("%d\n", len);
+        for (int i = lo; i < hi; i++){
+            if (i != lo)
+                printf("*");
+            printf("%d", i);
+        }
     }
     return 0;
 }

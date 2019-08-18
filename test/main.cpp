@@ -1,12 +1,10 @@
 #include <iostream>
-#include <string>
+#include <set>
 using namespace std;
 int main(){
-    int a;
-    string b;
-    cin >> a;
-    getline(cin, b);
-    cout << a << endl << b << endl;
-    cout << b.substr(2);
+    set<int> st;
+    st.insert(1);
+    auto itr = st.end();
+    itr--;
     return 0;
 }
