@@ -1,8 +1,7 @@
 # depslib dependency file v1.0
-1558361657 source:e:\code\pat\1026\main.cpp
+1566181841 source:e:\code\pat\1026\main.cpp
 	<iostream>
-	<cstdio>
 	<vector>
 	<algorithm>
-	<climits>
+	<cmath>
 

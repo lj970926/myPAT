@@ -1,95 +1,121 @@
 #include <iostream>
-#include <cstdio>
 #include <vector>
 #include <algorithm>
-#include <climits>
+#include <cmath>
 using namespace std;
-const int maxn = 10000+5;
-const int CLOSE_TIME = 21*3600;
-
-struct Customer{
-    int atime,ptime,vip,stime;
-    Customer(int a,int p, int v):atime(a),ptime(p),vip(v),stime(INT_MAX){};
+const int op = 8* 3600, clo = 21*3600;
+const int inf = 999999999;
+struct Peo{
+    int arr, pro, st = clo + 1, vip;
+    Peo(int a, int p, int v):arr(a), pro(p), vip(v){};
 };
-
-struct Table{
-    int ftime = 0;
-    bool vip = false;
-    int times=0;
+struct Tab{
+    int num = 0,vip = 0,fin = 8 * 3600;
 };
+vector<Tab> table;
+vector<Peo> player;
 
-bool cmp(Customer &a,Customer &b){
-    return a.atime < b.atime;
+bool cmp1(Peo a, Peo b){
+    return a.arr < b.arr;
 }
 
-bool cmp2(Customer &a, Customer &b){
-    return a.stime < b.stime;
+bool cmp2(Peo a, Peo b){
+    return a.st < b.st;
 }
 
-int main()
-{
-    int n,k,m;
-    vector<Customer> customers;
-    cin >> n;
-    for (int i = 0;i < n;i++){
-        int h,m,s,v,p;
-        scanf("%d:%d:%d %d %d",&h,&m,&s,&p,&v);
-        customers.push_back(Customer(h*3600+m*60+s,p,v));
+int findnextvip(int vid){
+    for (vid++; vid < player.size() && player[vid].vip != 1; vid++) ;
+    return vid;
+}
+
+void alloc(int tid, int pid){
+    player[pid].st = max(table[tid].fin, player[pid].arr);
+    table[tid].fin = player[pid].st + player[pid].pro;
+    table[tid].num++;
+}
+
+void showT(int time){
+    int s = time % 60, m = time / 60 % 60, h = time/3600;
+    printf("%02d:%02d:%02d", h, m, s);
+}
+
+int main(){
+    int n;
+    scanf("%d", &n);
+    for (int i = 0; i < n; i++){
+        int h, m, s, p, ta;
+        scanf("%d:%d:%d %d %d", &h, &m, &s, &p, &ta);
+        int t = h * 3600 + m * 60 + s;
+        if (t > clo)
+            continue;
+        p = (p <= 120 ? p * 60 : 7200);
+        player.push_back(Peo(t, p, ta));
     }
-    cin >> k >> m;
-    vector<Table> tables(k+5);
-    for (int i = 0;i < m;i++){
-        int temp;
-        cin >> temp;
-        tables[temp].vip = true;
+    int k, m;
+    scanf("%d %d", &k, &m);
+    table.resize(k + 1);
+    for (int i = 0; i < m; i++){
+        int v;
+        scanf("%d", &v);
+        table[v].vip = 1;
     }
-    sort(customers.begin(),customers.end(),cmp);
-    //for (int i = 0;i < customers.size();i++) printf("%d\n",customers[i].atime);
-    //bool result = tables[2].vip;
-    int nextvip,curcus = 0;
-    for (nextvip =0;customers[nextvip].vip == 0;nextvip++) ;
-    for (int time = customers[0].atime;time < CLOSE_TIME&&curcus < customers.size();time++){
-        for (int j = 1;j <= k;j++)
-            if (tables[j].ftime <= time){
-                if (tables[j].vip){
-                    if (nextvip < customers.size()&&time >= customers[nextvip].atime){
-                        customers[nextvip].stime = time;
-                        tables[j].ftime = (customers[nextvip].ptime*60) + time;
-                        tables[j].times++;
-                        while(!customers[++nextvip].vip) ;
-                        continue;
-                    }
-                }
-                while (customers[curcus].vip&&curcus <nextvip) curcus++;
-                if (curcus < customers.size()&&time >= customers[curcus].atime){
-                    customers[curcus].stime = time;
-                    tables[j].ftime = (customers[curcus].ptime*60) + time;
-                    tables[j].times++;
-                    curcus++;
+    sort(player.begin(), player.end(), cmp1);
+    int vid = -1;
+    vid = findnextvip(vid);
+    for (int i = 0; i < player.size(); i++){
+        if (player[i].vip == 1 && i < vid)
+            continue;
+        int index = 0, minf = inf;
+        for (int j = 1; j <= k; j++){
+            if (table[j].fin < minf){
+                index = j;
+                minf = table[j].fin;
+            }
+        }
+        if (minf >= clo)
+            break;
+        if (table[index].vip == 1 && player[i].vip == 1){
+            alloc(index, i);
+            vid = findnextvip(vid);
+        }
+        else if (table[index].vip == 1 && player[i].vip == 0){
+            if (vid < player.size() && table[index].fin >= player[vid].arr){
+                alloc(index, vid);
+                vid = findnextvip(vid);
+                i--;
+            }
+            else
+                alloc(index, i);
+        }
+        else if (table[index].vip == 0 && player[i].vip == 1){
+            int vipind = 0, minvf = inf;
+            for (int j = 1; j <= k; j++){
+                if (table[j].vip == 1 && table[j].fin < minvf){
+                    vipind = j;
+                    minvf = table[j].fin;
                 }
             }
+            if (minvf <= player[i].arr)
+                alloc(vipind, i);
+            else
+                alloc(index, i);
+            vid = findnextvip(vid);
+        }
+        else{
+            alloc(index, i);
+        }
     }
-    sort(customers.begin(),customers.end(),cmp2);
-    int cnt = 0;
-    while (cnt < customers.size()&&customers[cnt].stime < INT_MAX) cnt++;
-    for (int i = 0;i < cnt;i++){
-        int ah,am,as,sh,sm,ss,wt;
-        ah = customers[i].atime/3600;am = customers[i].atime%3600/60;as = customers[i].atime%60;
-        sh = customers[i].stime/3600;sm = customers[i].stime%3600/60;ss = customers[i].stime%60;
-        wt = (int)((double)(customers[i].stime - customers[i].atime)/60 + 0.5);
-        printf("%02d:%02d:%02d %2d:%02d:%02d %d\n",ah,am,as,sh,sm,ss,wt);
+    sort(player.begin(), player.end(), cmp2);
+    for (int i = 0; i < player.size() && player[i].st < clo; i++){
+        showT(player[i].arr);
+        printf(" ");
+        showT(player[i].st);
+        printf(" %.0f\n", round((player[i].st - player[i].arr)/60.0));
     }
-    bool first = true;
-    for (int j = 1;j <= k;j++){
-        if (first)
-            first = false;
-        else
+    for (int i = 1; i <= k; i++){
+        if (i != 1)
             printf(" ");
-        printf("%d",tables[j].times);
+        printf("%d", table[i].num);
     }
-
-
-
-
     return 0;
 }
