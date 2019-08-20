@@ -2,56 +2,45 @@
 #include <vector>
 #include <algorithm>
 using namespace std;
-int n;
-vector<int> tres;
+vector<int> a, b;
 
-void  uajust(int low, int high){
-    int i = low, j = 2*i;
-    while (j <= high){
-        if (j+1 <= high && tres[j+1] > tres[j]){
-                j = j+1;
-        }
-        if (tres[i] < tres[j]){
-            swap(tres[i],tres[j]);
-            i = j;
-            j = 2 * i;
-        }else
-            break;
+void downAdjust(vector<int> &a, int lo, int hi){
+    int i = lo, j = i * 2;
+    while(j <= hi){
+        if (j + 1 <= hi && a[j + 1] > a[j]) j = j + 1;
+        if (a[i] > a[j]) break;
+        swap(a[i], a[j]);
+        i = j;
+        j = j * 2;
     }
 }
 
-int main()
-{
+int main(){
+    int n;
     scanf("%d", &n);
-    tres.resize(n+1);
-    for (int i = 0; i < n; i++){
-        int t;
-        scanf("%d", &t);
-    }
-    for (int i = 1; i <= n;i++)
-        scanf("%d", &tres[i]);
-    if (tres[2] > tres[1]){
+    a.resize(n + 1);
+    b.resize(n + 1);
+    for (int i = 1; i <= n; i++) scanf("%d", &a[i]);
+    for (int i = 1; i <= n; i++) scanf("%d", &b[i]);
+    int p;
+    for (p = 2; p <= n && b[p] >= b[p - 1]; p++) ;
+    int index = p;
+    while (p <= n && b[p] == a[p]) p++;
+    if (p == n + 1){
         printf("Insertion Sort\n");
-        int j = 2;
-        while (j <= n && tres[j] > tres[j-1]) j++;
-        int i = 1;
-        while(i < j && tres[i] < tres[j]) i++;
-        int tmp = tres[j];
-        for (int k = j-1;k >= i;k--)
-            tres[k+1] = tres[k];
-        tres[i] = tmp;
+        sort(b.begin() + 1, b.begin() + 1 + index);
     }
     else{
         printf("Heap Sort\n");
-        int i = 2;
-        while (i <= n && tres[i] < tres[1]) i++;
-        swap(tres[1],tres[--i]);
-        uajust(1,--i);
+        int high;
+        for (high = n; high > 2&& b[high] > b[1]; high--) ;
+        swap(b[1], b[high--]);
+        downAdjust(b, 1, high);
     }
-    for (int i = 1; i <= n; i++){
+    for (int i = 1; i < b.size(); i++){
         if (i != 1)
             printf(" ");
-        printf("%d", tres[i]);
+        printf("%d", b[i]);
     }
     return 0;
 }
