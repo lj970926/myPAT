@@ -2,49 +2,52 @@
 #include <vector>
 #include <algorithm>
 using namespace std;
-
-int dp[10005][105];
-int n,m;
-vector<int> v;
-vector<int> path;
+int n, m;
+const int maxn = 10005, maxm = 105;
+int dp[maxm];
+bool choice[maxn][maxm], flag[maxn] = {false};
+vector<int> coins;
 
 bool cmp(int a, int b){
     return a > b;
 }
 
-int main()
-{
-    cin >> n >> m;
-    for (int i = 0;i < n;i++){
-        int temp;
-        cin >> temp;
-        v.push_back(temp);
-    }
-    sort(v.begin(),v.end(),cmp);
-    for (int j = 0;j <= m;j++) dp[0][j] = 0;
-    for (int i = 0;i <= n;i++) dp[i][0] = 1;
-    for (int i = 1;i <= n;i++)
-    for (int c = 1; c <= m;c++){
-        if (dp[i-1][c] == 1 || ((c-v[i-1] >=0)&& (dp[i-1][c-v[i-1]] == 1)))
-            dp[i][c] = 1;
-    }
-    if (dp[n][m] == 0)
-        cout << "No Solution";
-    else{
-        for (int i = n,j = m;i >= 1&& j >= 0;){
-            if (dp[i-1][j-v[i-1]]==1){
-                path.push_back(v[i-1]);
-                j-= v[i-1];
-                i--;
+int main(){
+    scanf("%d %d", &n, &m);
+    coins.resize(n + 1);
+    for (int i = 1; i <= n; i++)
+        scanf("%d", &coins[i]);
+    sort(coins.begin() + 1, coins.end(), cmp);
+    for (int i = 1; i <= n; i++){
+        for (int v = m; v >= coins[i]; v--){
+            if (dp[v] <= dp[v - coins[i]] + coins[i]) {
+                choice[i][v] = true;
+                dp[v] = dp[v - coins[i]] + coins[i];
             }
-            else if (dp[i-1][j] == 1)
-                i--;
+            else
+                choice[i][v] = false;
         }
-        for (int i = 0;i < path.size();i++){
-             if (i > 0) cout << ' ';
-            cout << path[i];
-        }
-
     }
+    if (dp[m] == m){
+        int k = n, v = m;
+        while (k > 0){
+            if (choice[k][v]){
+                flag[k] = true;
+                v -= coins[k];
+            }
+            k--;
+        }
+        bool f = true;
+        for (int i = n; i > 0; i--){
+            if (flag[i]){
+                f ? f = false : printf(" ");
+                printf("%d", coins[i]);
+            }
+        }
+    }
+    else
+        printf("No Solution");
     return 0;
+
+
 }
