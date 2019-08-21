@@ -1,84 +1,84 @@
 #include <iostream>
-#include <map>
-#include <vector>
 #include <string>
+#include <vector>
+#include <cctype>
 #include <algorithm>
 using namespace std;
 struct Node{
-    int v,w;
-    Node(int v_, int w_):v(v_), w(w_){};
+    int dis, next;
+    Node(int d, int n):dis(d), next(n){};
 };
-const int maxn = 1020;
+const int maxn = 1050;
 const int inf = 0x3fffffff;
-map<string, int> sti;
 vector<Node> adj[maxn];
-int n, m, k, ds;
-int minn = -1;
+int n, k, m, ds, ans = -1;
 double mind = 0, avgd = inf;
 bool vis[maxn];
 int d[maxn];
+int sti(string s){
+    return isdigit(s[0]) ? stoi(s) : stoi(s.substr(1)) + n;
+}
 
-void dijkstra(int u){
-    double avgdis = 0.0;
-    int mdis = inf;
-    fill(d, d + maxn, inf);
+void dijkstra(int s){
     fill(vis, vis + maxn, false);
-    d[u] = 0;
-    for (int i = 0; i < n + m; i++){
-        int v = -1, mindis = inf;
-        for (int j = 1; j <= n + m; j++)
-        if (!vis[j] && d[j] < mindis){
-            mindis = d[j];
-            v = j;
+    fill(d, d + maxn, inf);
+    d[s] = 0;
+    double tmd;
+    bool flag = true;
+    for (int i = 1; i <= n + m; i++){
+        int v = -1, maxd = inf;
+        for (int j = 1; j <= n + m; j++){
+            if (!vis[j] && d[j] < maxd){
+                maxd = d[j];
+                v = j;
+            }
         }
-        if (v == -1 || d[v] > ds)
+        if (v == -1 ||(v <= n && d[v] > ds))
             return;
         vis[v] = true;
-        if (v <= n){
-            avgdis += (1.0 * d[v] / n);
-            if (d[v] < mdis)
-                mdis = d[v];
+        if (v <= n && flag){
+            tmd = d[v];
+            flag = false;
         }
         for (int j = 0; j < adj[v].size(); j++){
-            int nv = adj[v][j].v;
-            int w = adj[v][j].w;
-            if (!vis[nv] && d[v] + w < d[nv]){
-                d[nv] = d[v] + w;
-            }
-
+            int t = adj[v][j].next, w = adj[v][j].dis;
+            if (!vis[t] && d[v] + w < d[t])
+                d[t] = d[v] + w;
         }
     }
-    if (mdis > mind){
-        mind = mdis;
-        avgd = avgdis;
-        minn = u - n;
+    double avg = 0;
+    for (int i = 1; i <= n; i++)
+        avg += d[i];
+    avg /= n;
+    if (tmd > mind){
+        ans = s;
+        mind = tmd;
+        avgd = avg;
     }
-    else if (mdis == mind && avgdis < avgd){
-        avgd = avgdis;
-        minn = u - n;
+    else if (tmd == mind && avg < avgd){
+        ans = s;
+        avgd = avg;
     }
 }
 
 int main(){
     scanf("%d %d %d %d", &n, &m, &k, &ds);
-    for (int i = 1; i <= n; i++)
-        sti[to_string(i)] = i;
-    for (int i = 1; i <= m; i++)
-        sti["G" + to_string(i)] = i + n;
     for (int i = 0; i < k; i++){
-        char p1[3], p2[3];
-        int dist;
-        scanf("%s %s %d", p1, p2, &dist);
-        int u = sti[p1], v = sti[p2];
-        adj[u].push_back(Node(v, dist));
-        adj[v].push_back(Node(u, dist));
+        string sp1, sp2;
+        int dis;
+        cin >> sp1 >> sp2 >> dis;
+        int p1 = sti(sp1), p2 = sti(sp2);
+        adj[p1].push_back(Node(dis, p2));
+        adj[p2].push_back(Node(dis, p1));
     }
-    for (int i = 1; i <= m; i++){
-        dijkstra(i + n);
+    for (int i = n + 1; i <= n + m; i++){
+        dijkstra(i);
     }
-    if (minn == -1)
+    if (ans == -1)
         printf("No Solution");
-    else
-        printf("G%d\n%.1f %.1f", minn, mind, avgd);
+    else{
+        string s = "G" + to_string(ans - n);
+        printf("%s\n%.1f %.1f", s.c_str(), mind, avgd);
+    }
     return 0;
 }
