@@ -4,10 +4,10 @@
 using namespace std;
 const int maxn = 10005;
 const int inf = 0x3fffffff;
-int G[maxn][maxn], n, k, ds[maxn], p[maxn], cr[maxn], deg[maxn];
-bool vis[maxn];
+int G[maxn][maxn], n, k, ds[maxn], p[maxn], cr[maxn], ln[maxn];
+bool vis[maxn], istran[maxn];
 vector<int> ans;
-void dijkstra(int s){
+void dijkstra(int s, int d){
     fill(vis, vis + maxn, false);
     fill(ds, ds + maxn, inf);
     fill(p, p + maxn, -1);
@@ -21,7 +21,7 @@ void dijkstra(int s){
                 mind = ds[j];
             }
         }
-        if (v == -1)
+        if (v == -1 || v == d)
             return;
         vis[v] = true;
         for (int j = 0; j < maxn; j++){
@@ -29,10 +29,10 @@ void dijkstra(int s){
                 if (ds[v] + 1 < ds[j]){
                     ds[j] = ds[v] + 1;
                     p[j] = v;
-                    cr[j] = (deg[j] > 2 ? cr[v] + 1 : cr[v]);
+                    cr[j] = (istran[j] ? cr[v] + 1 : cr[v]);
                 }
                 else if (ds[v] + 1 == ds[j]){
-                    int num = (deg[j] > 2 ? cr[v] + 1 : cr[v]);
+                    int num = (istran[j] ? cr[v] + 1 : cr[v]);
                     if (num < cr[j]){
                         cr[j] = num;
                         p[j] = v;
@@ -58,7 +58,7 @@ void showpath(int d){
     for (int i = ans.size() - 1; i >= 0; i--){
         if (i == 0 || G[ans[i]][ans[i - 1]] != line){
             if (line != -1){
-                printf("Take Line#%d from %04d to %04d\n", line, p, ans[i]);
+                printf("Take Line#%d from %04d to %04d.\n", line, p, ans[i]);
             }
             if (i != 0){
                 line = G[ans[i]][ans[i - 1]];
@@ -74,11 +74,18 @@ int main()
     for (int i = 1; i <= n; i++){
         int m, p;
         scanf("%d %d", &m, &p);
+        if (ln[p] != 0 && ln[p] != i)
+            istran[p] = true;
+        if (ln[p] == 0)
+            ln[p] = i;
         for (int j = 1; j < m; j++){
             int t;
             scanf("%d", &t);
             G[t][p] = G[p][t] = i;
-            deg[t]++; deg[p]++;
+            if (ln[t] != 0 && ln[t] != i)
+                istran[t] = true;
+            if (ln[t] == 0)
+                ln[t] = i;
             p = t;
         }
     }
@@ -86,7 +93,7 @@ int main()
     for (int i = 0; i < k; i++){
         int s, d;
         scanf("%d %d", &s, &d);
-        dijkstra(s);
+        dijkstra(s, d);
         findpath(d);
         showpath(d);
     }
