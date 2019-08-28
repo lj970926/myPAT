@@ -77,7 +77,7 @@ int main(){
         string a, b;
         cin >> a >> b;
         solve(a, b);
-        printf("%d\n", ans.size());
+        printf("%d\n", int(ans.size()));
         for (auto it = ans.begin(); it != ans.end(); it++){
             cout << *it << endl;
         }

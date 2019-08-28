@@ -1,0 +1,8 @@
+# depslib dependency file v1.0
+1566987863 source:e:\code\pat\1143\main.cpp
+	<iostream>
+	<vector>
+	<unordered_map>
+	<unordered_set>
+	<climits>
+
