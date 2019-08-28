@@ -1,73 +1,46 @@
 #include <iostream>
 #include <vector>
-#include <unordered_map>
-#include <unordered_set>
-#include <climits>
+#include <map>
+#include <algorithm>
 using namespace std;
-unordered_map<int, long long> tre;
 vector<int> pre;
-const long long root = 0x3ffffffff;
-void create(int i, int j){
-    if (j - i <= 1)
-        return;
-    int mid;
-    for (mid = i + 1; mid < j && pre[mid] < pre[i]; mid++) ;
-    if (mid - i != 1){
-        tre[pre[i + 1]] = pre[i];
-        create(i + 1, mid);
-    }
-    if (mid != j){
-        tre[pre[mid]] = pre[i];
-        create(mid, j);
-    }
-}
-
-int main()
-{
+map<int, bool> has;
+int main(){
     int m, n;
     scanf("%d %d", &m, &n);
     pre.resize(n);
     for (int i = 0; i < n; i++){
         scanf("%d", &pre[i]);
+        has[pre[i]] = true;
     }
-    tre[pre[0]] = root;
-    create(0, n);
+
     for (int i = 0; i < m; i++){
-        int a, b;
-        scanf("%d %d", &a, &b);
-        bool fda = true, fdb = true;
-        if (tre.find(a) == tre.end())
-            fda = false;
-        if (tre.find(b) == tre.end())
-            fdb = false;
-        if (!fda && !fdb){
-            printf("ERROR: %d and %d are not found.\n", a, b);
+        int u, v;
+        scanf("%d %d", &u, &v);
+        if (!has[u] && !has[v]){
+            printf("ERROR: %d and %d are not found.\n", u, v);
             continue;
         }
-        if (!fda){
-            printf("ERROR: %d is not found.\n", a);
+        if (!has[u]){
+            printf("ERROR: %d is not found.\n", u);
             continue;
         }
-        if (!fdb){
-            printf("ERROR: %d is not found.\n", b);
+        if (!has[v]){
+            printf("ERROR: %d is not found.\n", v);
             continue;
         }
-        unordered_set<int> path;
-        long long key = a;
-        while (key != root){
-            path.insert(key);
-            key = tre[key];
+        int lo = min(u, v), hi = max(u, v);
+        int a;
+        for (int j = 0; j < n; j++){
+            if (pre[j] >= lo && pre[j] <= hi){
+                a = pre[j];
+                break;
+            }
         }
-        key = b;
-        while (path.find(key) == path.end()){
-            key = tre[key];
-        }
-        if (key == a)
-            printf("%d is an ancestor of %d.\n", a, b);
-        else if (key == b)
-            printf("%d is an ancestor of %d.\n", b, a);
+        if (a == u || a == v)
+            printf("%d is an ancestor of %d.\n", a, a == u ? v : u);
         else
-            printf("LCA of %d and %d is %d.\n", a, b, key);
+            printf("LCA of %d and %d is %d.\n", u, v, a);
     }
     return 0;
 }
