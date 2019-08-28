@@ -1,18 +1,26 @@
 #include <iostream>
-#include <algorithm>
 #include <vector>
+#include <algorithm>
 using namespace std;
 const int maxn = 10005;
 const int inf = 0x3fffffff;
-int G[maxn][maxn], n, k, ds[maxn], p[maxn], cr[maxn], ln[maxn];
-bool vis[maxn], istran[maxn];
+struct Node{
+    int next, line;
+    Node(int n, int l):next(n), line(l){};
+};
+vector<vector<Node> >adj(maxn);
 vector<int> ans;
+bool vis[maxn];
+int p[maxn], cr[maxn], n, k, ds[maxn], ln[maxn];
+
 void dijkstra(int s, int d){
     fill(vis, vis + maxn, false);
-    fill(ds, ds + maxn, inf);
     fill(p, p + maxn, -1);
-    fill(cr, cr + maxn, 0);
+    fill(cr, cr + maxn, inf);
+    fill(ds, ds + maxn, inf);
+    fill(ln, ln + maxn, 0);
     ds[s] = 0;
+    cr[s] = 0;
     for (int i = 0; i < maxn; i++){
         int v = -1, mind = inf;
         for (int j = 0; j < maxn; j++){
@@ -24,22 +32,24 @@ void dijkstra(int s, int d){
         if (v == -1 || v == d)
             return;
         vis[v] = true;
-        for (int j = 0; j < maxn; j++){
-            if (!vis[j] && G[v][j] != 0){
-                if (ds[v] + 1 < ds[j]){
-                    ds[j] = ds[v] + 1;
-                    p[j] = v;
-                    cr[j] = (istran[j] ? cr[v] + 1 : cr[v]);
+        for (int j = 0; j < adj[v].size(); j++){
+            int ne = adj[v][j].next, lin = adj[v][j].line;
+            if (!vis[ne]){
+                int crs = (lin == ln[v] ? cr[v] : cr[v] + 1);
+                if (ds[v] + 1 < ds[ne]){
+                    ds[ne] = ds[v] + 1;
+                    ln[ne] = lin;
+                    p[ne] = v;
+                    cr[ne] = crs;
                 }
-                else if (ds[v] + 1 == ds[j]){
-                    int num = (istran[j] ? cr[v] + 1 : cr[v]);
-                    if (num < cr[j]){
-                        cr[j] = num;
-                        p[j] = v;
-                    }
+                else if (ds[v] + 1 == ds[ne] && crs < cr[ne]){
+                    ln[ne] = lin;
+                    cr[ne] = crs;
+                    p[ne] = v;
                 }
             }
         }
+
     }
 }
 
@@ -49,43 +59,32 @@ void findpath(int d){
         ans.push_back(d);
         d = p[d];
     }
-
 }
 
-void showpath(int d){
-    printf("%d\n", ds[d]);
-    int p, line = -1;
-    for (int i = ans.size() - 1; i >= 0; i--){
-        if (i == 0 || G[ans[i]][ans[i - 1]] != line){
-            if (line != -1){
-                printf("Take Line#%d from %04d to %04d.\n", line, p, ans[i]);
-            }
-            if (i != 0){
-                line = G[ans[i]][ans[i - 1]];
-                p = ans[i];
-            }
+void showpath(int s, int d){
+    printf("%d\n",ds[d]);
+    cr[s] = 1;
+    int p = s;
+    for (int i = ans.size() - 3; i >= -1; i--){
+        if (i == -1 || cr[ans[i]] != cr[ans[i + 1]]){
+            printf("Take Line#%d from %04d to %04d.\n", ln[ans[i + 1]], p, ans[i + 1]);
+            p = ans[i + 1];
         }
     }
 }
 
-int main()
-{
+int main(){
     scanf("%d", &n);
     for (int i = 1; i <= n; i++){
         int m, p;
-        scanf("%d %d", &m, &p);
-        if (ln[p] != 0 && ln[p] != i)
-            istran[p] = true;
-        if (ln[p] == 0)
-            ln[p] = i;
-        for (int j = 1; j < m; j++){
+        scanf("%d", &m);
+        for (int j = 0; j < m; j++){
             int t;
             scanf("%d", &t);
-            G[t][p] = G[p][t] = i;
-            if (ln[t] != 0 && ln[t] != i)
-                istran[t] = true;
-            if (ln[t] == 0)
-                ln[t] = i;
+            if (j != 0){
+                adj[p].push_back(Node(t, i));
+                adj[t].push_back(Node(p, i));
+            }
             p = t;
         }
     }
@@ -95,7 +94,6 @@ int main()
         scanf("%d %d", &s, &d);
         dijkstra(s, d);
         findpath(d);
-        showpath(d);
+        showpath(s, d);
     }
-    return 0;
 }
