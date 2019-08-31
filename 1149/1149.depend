@@ -1,0 +1,6 @@
+# depslib dependency file v1.0
+1567231002 source:e:\code\pat\1149\main.cpp
+	<iostream>
+	<unordered_set>
+	<vector>
+
