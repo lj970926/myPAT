@@ -1,74 +1,48 @@
 #include <iostream>
-#include <vector>
-#include <queue>
+#include <string>
 using namespace std;
 struct Node{
     int left, right;
 };
-bool h[25] = {false};
-vector<Node> tree;
-int n;
-
-int lorder(int r){
-    int total = 1, last = r;
-    queue<int> q;
-    q.push(r);
-    while (!q.empty()){
-        int t = q.front();
-        q.pop();
-        if (tree[t].left != -1){
-            q.push(tree[t].left);
-            total++;
-            last = tree[t].left;
-        }
-        else if (total == n) return last;
-        else return -1;
-        if (tree[t].right != -1){
-            q.push(tree[t].right);
-            total++;
-            last = tree[t].right;
-        }
-        else if (total == n) return last;
-        else return -1;
+const int maxn = 25;
+Node tree[maxn];
+bool isroot[maxn];
+int maxi = -1, last = -1;
+void dfs(int index, int root){
+    if (index > maxi){
+        maxi = index;
+        last = root;
     }
+    if (tree[root].left != -1)
+        dfs(index * 2, tree[root].left);
+    if (tree[root].right != -1)
+        dfs(index * 2 + 1, tree[root].right);
 }
 
-int main()
-{
-
+int main(){
+    int n;
     scanf("%d", &n);
-    tree.resize(n);
     for (int i = 0; i < n; i++){
-        getchar();
-        char c1, c2;
-        scanf("%c %c", &c1, &c2);
-        if (c1 == '-')
+        string s1, s2;
+        cin >> s1 >> s2;
+        if (s1 != "-"){
+            tree[i].left = stoi(s1);
+            isroot[stoi(s1)] = true;
+        }
+        else
             tree[i].left = -1;
-        else{
-            int nc = c1 - '0';
-            tree[i].left = nc;
-            h[nc] = true;
+        if (s2 != "-"){
+            tree[i].right = stoi(s2);
+            isroot[stoi(s2)] = true;
         }
-        if (c2 == '-')
+        else
             tree[i].right = -1;
-        else{
-            int nc = c2 - '0';
-            tree[i].right = nc;
-            h[nc] = true;
-        }
     }
     int root;
-    for (int i = 0; i < n; i++)
-        if (!h[i]){
-            root = i;
-            break;
-        }
-    int res = lorder(root);
-    if (res == -1){
-        printf("NO %d", root);
-    }
-    else{
-        printf("YES %d", res);
-    }
-    return 0;
+    for (root = 0; isroot[root]; root++) ;
+    dfs(1, root);
+    if (maxi == n)
+        printf("YES %d\n", last);
+    else
+        printf("NO %d\n", root);
 }
