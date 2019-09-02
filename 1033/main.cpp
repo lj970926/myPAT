@@ -2,47 +2,64 @@
 #include <vector>
 #include <algorithm>
 using namespace std;
-struct Sta{
-    int dis;
-    double pri;
+const int inf = 0x3fffffff;
+struct Station{
+    double price;
+    double dis;
+    Station(double p, double d):price(p), dis(d){};
 };
-vector<Sta> sta;
 
-bool cmp(Sta &a, Sta &b){
+bool cmp(Station a, Station b){
     return a.dis < b.dis;
 }
 
-int main()
-{
-    int cmax, d, davg, n;
-    scanf("%d %d %d %d", &cmax, &d, &davg, &n);
+vector<Station> sta;
+int main(){
+    int cap, ds, dpu, n;
+    scanf("%d %d %d %d", &cap, &ds, &dpu, &n);
     for (int i = 0; i < n; i++){
-        Sta t;
-        scanf("%lf, %d", &t.pri, &t.dis);
-        sta.push_back(t);
+        double d;
+        double p;
+        scanf("%lf %lf", &p, &d);
+        sta.push_back(Station(p, d));
     }
+    sta.push_back(Station(inf, ds));
     sort(sta.begin(), sta.end(), cmp);
-    if (sta[0].dis != 0)
-        printf("The maximum travel distance = 0.00");
-    else{
-        int i = 0;
-        while (i < n){
-            if (sta[i + 1].dis > sta[i].dis + cmax * davg){
-                printf("The maximum travel distance = %.2f", sta[i].dis + cmax * davg);
-                return 0;
-            }
-            int j, minp = 0x3fffffff, no = -1;
-            for (j = i + 1; sta[j].dis <= di + cmax * davg && sta[j].pri >= sta[i].pri; j++){
-                if (sta[j].pri < minp){
-                    minp = sta[j].pri;
-                    no = sta[j];
-                }
-            }
-            if (sta[j].dis <= sta[i].dis + cmax * davg){
-
-            }
-        }
+    if (sta[0].dis != 0.0){
+        printf("The maximum travel distance = 0.00\n");
+        return 0;
     }
+    int index = 0;
+    double sum = 0.0, tank = 0.0;
+    while (1){
+        if (sta[index + 1].dis - sta[index].dis > cap * dpu){
+            printf("The maximum travel distance = %.2f\n", sta[index].dis + cap * dpu);
+            return 0;
+        }
+        int minp = index + 1, i;
+        for (i = index + 1; i < n + 1 && (sta[i].dis - sta[index].dis) <= cap * dpu ; i++){
+            if (sta[i].price < sta[index].price){
+                minp = i;
+                break;
+            }
+            if (sta[i].price < sta[minp].price)
+                minp = i;
+        }
+        if (sta[minp].price >= sta[index].price){
+            if (i >= n + 1){
+                sum += (((ds - sta[index].dis)) / dpu - tank) * sta[index].price;
+                break;
+            }
+            sum += (cap - tank) * sta[index].price;
+            tank = cap - (sta[minp].dis - sta[index].dis) / dpu;
+        }
+        else{
+            sum += ((sta[minp].dis - sta[index].dis) / dpu - tank) * sta[index].price;
+            tank = 0.0;
+        }
+        index = minp;
+    }
+    printf("%.2f", sum);
     return 0;
 
 }

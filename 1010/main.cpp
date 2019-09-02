@@ -15,7 +15,7 @@ long long convert(string s, long long r){
 
 long long findR(string s, long long num){
     char maxc = *max_element(s.begin(), s.end());
-    long long lo = (isdigit(maxc) ?  maxc - '0' : maxc - 'A' + 10) + 1;
+    long long lo = (isdigit(maxc) ?  maxc - '0' : maxc - 'a' + 10) + 1;
     long long hi = max(lo, num);
     while (lo <= hi){
         long long mid = lo + (hi - lo) / 2;
