@@ -4,59 +4,45 @@
 #include <algorithm>
 using namespace std;
 
-int num(char c){
-    if (isdigit(c))
-        return c - '0';
-    return c - 'a' + 10;
+long long convert(string s, long long r){
+    long long sum = 0;
+    for (int i = 0; i < s.size(); i++){
+        int t = isdigit(s[i]) ? s[i] - '0' : s[i] - 'a' + 10;
+        sum = sum * r + t;
+    }
+    return sum;
 }
 
-long long contd(string n, int rad){
-    long long ans = 0;
-    for (int i = 0; i < n.size(); i++){
-        ans = ans * rad + num(n[i]);
-    }
-    return ans;
-}
-
-long long findr(string n, long long a){
-    long long lo = 2, hi = 36;
-    for (int i = 0; i < n.size(); i++){
-        if (lo - 1 < num(n[i]))
-            lo = num(n[i])+ 1;
-    }
-    long long ans = -1;
+long long findR(string s, long long num){
+    char maxc = *max_element(s.begin(), s.end());
+    long long lo = (isdigit(maxc) ?  maxc - '0' : maxc - 'A' + 10) + 1;
+    long long hi = max(lo, num);
     while (lo <= hi){
         long long mid = lo + (hi - lo) / 2;
-        long long  tr = contd(n, mid);
-        if (tr == a){
-            ans = mid;
-        }\
-        if (tr < a)
-            lo = mid + 1;
-        else
+        long long t = convert(s, mid);
+        if (t > num || t < 0){
             hi = mid - 1;
+        }
+        else if (t == num)
+            return mid;
+        else
+            lo = mid + 1;
     }
-    return ans;
+    return -1;
 }
 
-int main()
-{
+int main(){
     string n1, n2;
-    cin >> n1 >> n2;
-    int tag, r;
-    scanf("%d %d", &tag, &r);
+    long long tag, radix;
+    cin >> n1 >> n2 >> tag >> radix;
     long long res;
-    if (tag == 1){
-        long long a1 = contd(n1, r);
-        res =findr(n2, a1);
-    }
-    else{
-        long long a2 = contd(n2, r);
-        res = findr(n1, a2);
-    }
-    if (res == -1)
-        printf("Impossible");
+    if (tag == 1)
+        res = findR(n2, convert(n1, radix));
     else
-        printf("%lld", res);
+        res = findR(n1, convert(n2, radix));
+    if (res == -1)
+        printf("Impossible\n");
+    else
+        printf("%lld\n", res);
     return 0;
 }
