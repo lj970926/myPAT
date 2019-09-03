@@ -1,0 +1,6 @@
+# depslib dependency file v1.0
+1567520900 source:e:\code\pat\1031\main.cpp
+	<iostream>
+	<string>
+	<algorithm>
+

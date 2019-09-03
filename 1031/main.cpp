@@ -1,28 +1,27 @@
 #include <iostream>
 #include <string>
+#include <algorithm>
 using namespace std;
-
-int main()
-{
+char G[40][40];
+int y[3] = {0, 1, 0}, x[3] = {1, 0, -1};
+int main(){
     string s;
     cin >> s;
-    int n = s.size();
-    int n2,n1;
-    for (n2 = 3;n2 <= n-2;n2++)
-        if ((n+2-n2)%2 == 0 && (n+2-n2)/2 <= n2)
-            break;
-    n1 = (n+2-n2)/2;
-    string space;
-    for (int i = 0;i < n2-2;i++) space.append(" ");
-    int l = n-1;
-    int i = 0;
-    while (l > n2-1){
-        cout << s[i] << space << s[i+l] << endl;
-        i++;
-        l-=2;
+    int n = s.size() + 2, n1 = n / 3, n2 = n / 3 + n % 3;
+    fill(G[0], G[0] + 40 * 40, ' ');
+    int tx = 0, ty = 0, p = 0;
+    for (int i = 0; i < s.size(); i++){
+        G[tx][ty] = s[i];
+        if (tx + x[p] >= n1 || ty + y[p] >= n2 || tx + x[p] < 0 || ty + y[p] < 0)
+            p++;
+        tx = tx + x[p];
+        ty = ty + y[p];
     }
-    for (int j = i;j <= i+l;j++){
-        cout << s[j];
+    for (int i = 0; i < n1; i++){
+        for (int j = 0; j < n2; j++){
+            printf("%c", G[i][j]);
+        }
+        printf("\n");
     }
     return 0;
 }
