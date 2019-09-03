@@ -1,49 +1,31 @@
 #include <iostream>
 #include <string>
-#include <vector>
 using namespace std;
-struct member{
-    string id;
-    int intime;
-    int outtime;
-    member(string i, int in, int out):id(i),intime(in),outtime(out){};
-};
-int main()
-{
-    vector<member> V;
-    int N;
-    cin >> N;
-    string temp_id;
-    int temp_h;
-    int temp_m;
-    int temp_s;
-    int in;
-    int out;
-    for (int i = 0; i < N;i++){
-        cin >> temp_id;
-        cin >> temp_h;
-        cin.get();
-        cin >> temp_m;
-        cin.get();
-        cin >> temp_s;
-        in = temp_h*3600 + temp_m*60 + temp_s;
-        cin >> temp_h;
-        cin.get();
-        cin >> temp_m;
-        cin.get();
-        cin >> temp_s;
-        out = temp_h*3600 + temp_m*60 + temp_s;
-        V.push_back(member(temp_id,in,out));
+const int inf = 0x3fffffff;
 
+int convert(int h, int m, int s){
+    return h * 3600 + m * 60 + s;
+}
+
+int main(){
+    int m;
+    scanf("%d", &m);
+    string uid, lid;
+    int minin = inf, maxout = -1;
+    for (int i = 0; i < m; i++){
+        string id;
+        int hh, mm, ss;
+        cin >> id;
+        scanf("%d:%d:%d", &hh, &mm, &ss);
+        if (convert(hh, mm, ss) < minin){
+            minin = convert(hh, mm, ss);
+            uid = id;
+        }
+        scanf("%d:%d:%d", &hh, &mm, &ss);
+        if (convert(hh, mm, ss) > maxout){
+            maxout = convert(hh, mm, ss);
+            lid = id;
+        }
     }
-    int ear = 0;
-    int latest = 0;
-    for (int i = 1;i < V.size();i++){
-        if (V[i].intime< V[ear].intime)
-            ear = i;
-        if (V[i].outtime > V[latest].outtime)
-            latest = i;
-    }
-    cout << V[ear].id << ' ' << V[latest].id;
-    return 0;
+    printf("%s %s\n", uid.c_str(), lid.c_str());
 }
