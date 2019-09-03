@@ -1,29 +1,29 @@
 #include <iostream>
 #include <vector>
 using namespace std;
-
-int main()
-{
-    int n;
-    cin >> n;
-    vector<int> order(60);
-    vector<int> card(60);
-    for (int i = 1;i <=54;i++)
-        card[i] = i;
-    for (int i = 1;i <= 54;i++)
-        scanf("%d",&order[i]);
-    for (int i = 0;i < n;i++){
-        vector<int> temp(60);
-        for (int j = 1;j <= 54;j++){
-            temp[order[j]] = card[j];
+vector<int> order(55), ans(55), tmp(55);
+char prefix[6] = {"SHCDJ"};
+int main(){
+    int k;
+    scanf("%d", &k);
+    for (int i = 1; i < 55; i++)
+        scanf("%d", &order[i]);
+    for (int i = 1; i < 55; i++){
+        ans[i] = i;
+    }
+    for (int i = 0; i < k; i++){
+        for (int j = 1; j < 55; j++){
+            tmp[order[j]] = ans[j];
         }
-        card = temp;
+        ans = tmp;
     }
-    char c[5] = {'S','H','C','D','J'};
-    bool first = true;
-    for (int i = 1;i <= 54;i++){
-        first? first = false:printf(" ");
-        cout << c[(card[i]-1)/13] << (card[i]-1)%13 + 1;
+    for (int i = 1; i < 55; i++){
+        char c = prefix[(ans[i] - 1) / 13];
+        int n = (ans[i] - 1) % 13 + 1;
+        if (i != 1)
+            printf(" ");
+        printf("%c%d", c, n);
     }
-    return 0;
+    printf("\n");
+
 }
