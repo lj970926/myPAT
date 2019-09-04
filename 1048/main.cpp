@@ -1,27 +1,24 @@
 #include <iostream>
-#include <algorithm>
 using namespace std;
-int coins[100005];
-int main()
-{
+int coins[5000];
+int main(){
     int n, m;
-    cin >> n >> m;
-    for (int i = 0;i < n;i++) {
-        int temp;
-        cin >> temp;
-        coins[temp]++;
+    scanf("%d %d", &n, &m);
+    for (int i = 0; i < n; i++){
+        int t;
+        scanf("%d", &t);
+        coins[t]++;
     }
-    for (int i = 1;i <= m/2;i++){
-         if (coins[i]){
+    for (int i = 1; i <= m / 2; i++){
+        if (coins[i] != 0){
             coins[i]--;
-            if (coins[m-i]){
-                cout << i << ' ' << m-i;
+            if (coins[m - i] != 0){
+                printf("%d %d\n", i, m - i);
                 return 0;
             }
             coins[i]++;
-
-         }
+        }
     }
-    cout << "No Solution";
+    printf("No Solution\n");
     return 0;
 }
