@@ -2,25 +2,20 @@
 
 using namespace std;
 
-int main()
-{
-    int N;
-    cin >> N;
-    int *p = new int[N];
-    for (int i = 0;i < N;i++){
-        cin >> p[i];
-    }
-    int curstorey = 0;
-    int sum = 0;
-    for (int i = 0;i < N;i++){
-        if (curstorey < p[i]){
-            sum += ((p[i]-curstorey)*6 + 5);
+int main(){
+    int n, floor = 0, sum = 0;
+    scanf("%d", &n);
+    for (int i = 0; i < n; i++){
+        int t;
+        scanf("%d", &t);
+        if (t > floor){
+            sum += (t - floor) * 6 + 5;
         }
         else{
-            sum += ((curstorey-p[i])*4 + 5);
+            sum += (floor - t) * 4 + 5;
         }
-        curstorey = p[i];
+        floor = t;
     }
-    cout << sum;
+    printf("%d\n", sum);
     return 0;
 }
