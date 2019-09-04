@@ -1,74 +1,81 @@
-#include <algorithm>
+#include<iostream>
 #include <vector>
-#include <cstdio>
-#include <climits>
+#include <algorithm>
 using namespace std;
+const int maxn = 510;
+const int inf = 0x3fffffff;
+struct Node{
+    int v, cost, dis;
+    Node(int v_, int c, int d):v(v_), cost(c), dis(d){};
+};
+int G[maxn][maxn], C[maxn][maxn];
+vector<vector<int> > pre(maxn);
+vector<int> path, tmp;
+bool vis[maxn];
+int d[maxn];
+int n, m, s, dt, minc = inf;
 
-int e[510][510],cost[510][510],dis[510];
-vector<int> pre[510];
-bool visited[510];
-int n,m,s,d;
-vector<int> path,temppath;
-int mincost = INT_MAX;
-void dfs(int d){
-    temppath.push_back(d);
-    if (d == s){
-            int temp = 0;
-        for (int i = 0;i < temppath.size()-1;i++)
-            temp += cost[temppath[i]][temppath[i+1]];
-        if (temp < mincost){
-            mincost = temp;
-            path = temppath;
+void dijkstra(int u){
+    fill(d, d + maxn, inf);
+    d[u] = 0;
+    for (int i = 0; i < n; i++){
+        int v = -1, mind = inf;
+        for (int j = 0; j < n; j++){
+            if (!vis[j]&& d[j] < mind){
+                mind = d[j];
+                v = j;
+            }
         }
-        temppath.pop_back();
-        return;
-
+        if (v == -1 || v == dt)
+            return;
+        vis[v] = true;
+        for (int j = 0; j < n; j++){
+            int w = G[v][j];
+            if (!vis[j] && G[v][j] != 0){
+                if (d[v] + w < d[j]){
+                    pre[j].clear();
+                    d[j] = d[v] + w;
+                    pre[j].push_back(v);
+                }
+                else if (d[v] + w == d[j]){
+                    pre[j].push_back(v);
+                }
+            }
+        }
     }
-    for (int i = 0;i < pre[d].size();i++)
-        dfs(pre[d][i]);
-    temppath.pop_back();
-    return;
 }
 
-int main()
-{
-    fill(e[0],e[0]+510*510,INT_MAX);
-    fill(cost[0],cost[0]+510*510,INT_MAX);
-    fill(dis,dis+510,INT_MAX);
-    fill(visited,visited + 510,false);
-    scanf("%d %d %d %d",&n,&m,&s,&d);
-    for (int i = 0;i < m;i++){
-        int u,v;
-        scanf("%d %d",&u,&v);
-        scanf("%d %d",&e[u][v],&cost[u][v]);
-        e[v][u] = e[u][v];
-        cost[v][u] = cost[u][v];
-    }
-    dis[s] = 0;
-    for (int i = 0;i < n;i++){
-        int u = -1,mindis = INT_MAX;
-        for (int v = 0;v < n;v++)
-        if (!visited[v]&&dis[v] < mindis){
-            mindis = dis[v];
-            u = v;
+void dfs(int u, int cost){
+    if (u == s){
+        if (cost < minc){
+            minc = cost;
+            tmp.push_back(u);
+            path = tmp;
+            tmp.pop_back();
         }
-        visited[u] = true;
-        for (int v = 0;v < n;v++){
-            if (!visited[v]&&(e[u][v] < INT_MAX)){
-                if (dis[u] + e[u][v] < dis[v]){
-                    pre[v].clear();
-                    pre[v].push_back(u);
-                    dis[v] = dis[u] + e[u][v];
-                }
-                else if (dis[u] + e[u][v]==dis[v])
-                    pre[v].push_back(u);
-            }
+        return;
+    }
+    tmp.push_back(u);
+    for (int i = 0; i < pre[u].size(); i++){
+        int v = pre[u][i];
+        dfs(v, cost + C[u][v]);
+    }
+    tmp.pop_back();
+}
 
-        }
+int main(){
+    scanf("%d %d %d %d", &n, &m, &s, &dt);
+    for (int i = 0; i < m; i++){
+        int a, b, ds, cs;
+        scanf("%d %d %d %d", &a, &b, &ds, &cs);
+        G[a][b] = G[b][a] = ds;
+        C[a][b] = C[b][a] = cs;
     }
-    dfs(d);
-    for (int i = path.size()-1;i>=0;i--)
-        printf("%d ",path[i]);
-    printf("%d %d",dis[d],mincost);
+    dijkstra(s);
+    dfs(dt, 0);
+    for (int i = path.size() - 1; i >= 0; i--){
+        printf("%d ", path[i]);
+    }
+    printf("%d %d\n", d[dt], minc);
     return 0;
 }
