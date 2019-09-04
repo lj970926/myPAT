@@ -2,38 +2,29 @@
 #include <vector>
 #include <algorithm>
 using namespace std;
-
-int main()
-{
-    vector<int> coupons,products;
-    int nc,np;
-    cin >> nc;
-    for (int i = 0; i< nc;i++){
-        int temp;
-        cin >> temp;
-        coupons.push_back(temp);
+vector<long long> cou, pro;
+int main(){
+    int nc, np;
+    scanf("%d", &nc);
+    cou.resize(nc);
+    for (int  i = 0; i < nc; i++){
+        scanf("%lld", &cou[i]);
     }
-    cin >> np;
-    for (int i = 0;i < np;i++){
-        int temp;
-        cin >> temp;
-        products.push_back(temp);
+    scanf("%d", &np);
+    pro.resize(np);
+    for (int i = 0; i < np; i++){
+        scanf("%lld", &pro[i]);
     }
-    sort(coupons.begin(),coupons.end());
-    sort(products.begin(),products.end());
+    sort(cou.begin(), cou.end());
+    sort(pro.begin(), pro.end());
     long long sum = 0;
-    int pos = 0;
-    while(pos < coupons.size() && pos < products.size()&&coupons[pos] < 0 && products[pos] < 0){
-        sum += (coupons[pos]*products[pos]);
-        pos++;
+    int len = min(cou.size(), pro.size());
+    for (int i = 0; i < len && cou[i] < 0 && pro[i] < 0; i++){
+        sum += pro[i] * cou[i];
     }
-    pos = coupons.size() - 1;
-    int posp = products.size() - 1;
-    while (pos >= 0&& posp >= 0&&coupons[pos] > 0 && products[posp] > 0){
-        sum += (coupons[pos]*products[posp]);
-        pos--;
-        posp--;
+    for (int i = 1; i <= len && cou[cou.size() - i] > 0 && pro[pro.size() - i] > 0; i++){
+        sum += cou[cou.size() - i] * pro[pro.size() - i];
     }
-    cout << sum;
+    printf("%lld\n", sum);
     return 0;
 }
