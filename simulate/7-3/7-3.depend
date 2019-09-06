@@ -1,0 +1,7 @@
+# depslib dependency file v1.0
+1567690860 source:e:\code\pat\simulate\7-3\main.cpp
+	<iostream>
+	<vector>
+	<algorithm>
+	<unordered_map>
+
