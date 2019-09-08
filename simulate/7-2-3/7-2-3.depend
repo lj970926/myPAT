@@ -1,0 +1,6 @@
+# depslib dependency file v1.0
+1567854781 source:e:\code\pat\simulate\7-2-3\main.cpp
+	<iostream>
+	<vector>
+	<algorithm>
+
